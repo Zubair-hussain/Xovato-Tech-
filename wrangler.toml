@@ -1,0 +1,8 @@
+name = "xovato"                          # Exact project name
+
+compatibility_date = "2026-01-01"        # Recent for Node.js compat
+
+compatibility_flags = ["nodejs_compat", "nodejs_compat_v2"]
+
+# This is the ONLY output dir key Pages allows/requires
+pages_build_output_dir = ".open-next"
