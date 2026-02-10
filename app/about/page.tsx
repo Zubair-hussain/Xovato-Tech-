@@ -62,6 +62,7 @@ export default function AboutPage() {
                 servicesBtnRef={servicesBtnRef}
                 panelRef={panelRef}
                 scrollTo={scrollTo}
+                scrollProg={0}
             />
             <div className="pt-24">
                 <Suspense fallback={<div className="text-white/70 text-center py-20">Loading About section...</div>}>

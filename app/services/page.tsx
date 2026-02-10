@@ -30,6 +30,7 @@ export default function ServicesPage() {
                 servicesBtnRef={servicesBtnRef}
                 panelRef={panelRef}
                 scrollTo={scrollTo}
+                scrollProg={0}
             />
 
             {/* Add padding for fixed navbar */}

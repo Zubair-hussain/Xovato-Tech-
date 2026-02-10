@@ -16,6 +16,7 @@ type Props = {
   servicesBtnRef: React.RefObject<HTMLButtonElement | null>;
   panelRef: React.RefObject<HTMLDivElement | null>;
   scrollTo: (target: string, options?: any) => void;
+  scrollProg: number;
 };
 
 export default function Navbar({
@@ -25,10 +26,10 @@ export default function Navbar({
   servicesBtnRef,
   panelRef,
   scrollTo,
+  scrollProg,
 }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
-  const [scrollProg, setScrollProg] = useState(0);
 
   const mobilePanelRef = useRef<HTMLDivElement | null>(null);
   const pathname = usePathname();
@@ -65,18 +66,6 @@ export default function Navbar({
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Mobile-only scroll progress bar
-  useEffect(() => {
-    const onScroll = () => {
-      const doc = document.documentElement;
-      const max = Math.max(1, doc.scrollHeight - doc.clientHeight);
-      const p = (doc.scrollTop / max) * 100;
-      setScrollProg(p);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   // Dropdown list animations (desktop)
   const listVariants = useMemo(

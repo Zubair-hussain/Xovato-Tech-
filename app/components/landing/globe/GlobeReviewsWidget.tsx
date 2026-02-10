@@ -400,6 +400,21 @@ export default function GlobeReviewsWidget({ category = "Web App" }: { category?
   const isDragging = useRef(false);
   const lastMousePos = useRef({ x: 0, y: 0 });
 
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const { ref: canvasWrapRef, w, h } = useElementSize<HTMLDivElement>();
+  const canRenderCanvas = w > 40 && h > 40;
+
+  // Viewport Culling
+  const [isVisible, setIsVisible] = useState(true);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    if (canvasWrapRef.current) observer.observe(canvasWrapRef.current);
+    return () => observer.disconnect();
+  }, [canvasWrapRef]);
+
   const [regionIndex, setRegionIndex] = useState(0);
   const currentRegion = REGIONS[regionIndex % REGIONS.length];
 
@@ -420,9 +435,6 @@ export default function GlobeReviewsWidget({ category = "Web App" }: { category?
   const [displayName, setDisplayName] = useState("");
   const [reviewerEmail, setReviewerEmail] = useState("");
 
-  const overlayRef = useRef<HTMLDivElement | null>(null);
-  const { ref: canvasWrapRef, w, h } = useElementSize<HTMLDivElement>();
-  const canRenderCanvas = w > 40 && h > 40;
 
   /* --- Restore LS & Init --- */
   useEffect(() => {
@@ -719,6 +731,7 @@ export default function GlobeReviewsWidget({ category = "Web App" }: { category?
                 camera={{ position: [0, 0, 2.85], fov: 45 }}
                 gl={{ antialias: true, alpha: true }}
                 style={{ width: "100%", height: "100%", pointerEvents: "none" }} // Pass clicks to Overlay
+                frameloop={isVisible ? "always" : "never"}
               >
                 <ambientLight intensity={0.75} />
                 <directionalLight position={[5, 4, 5]} intensity={1.4} />

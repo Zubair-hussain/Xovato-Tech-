@@ -234,7 +234,7 @@ export default function WorkWithUsModal({
   }
 
   const content = (
-    <div className={cn("min-h-screen bg-[#020604] text-white selection:bg-emerald-500/30 flex items-center justify-center p-4 md:p-8 pt-24 overflow-hidden relative", isModal && "min-h-full bg-transparent pt-4")}>
+    <div className={cn("min-h-screen bg-[#020604] text-white selection:bg-emerald-500/30 flex items-center justify-center p-4 md:p-8 pt-24 overflow-y-auto md:overflow-hidden relative", isModal && "min-h-full bg-transparent pt-4")}>
       {!isModal && <SpotlightBackground />}
 
       {/* Close Button */}
@@ -245,7 +245,7 @@ export default function WorkWithUsModal({
         <X size={24} />
       </button>
 
-      <div className="w-full max-w-6xl z-10 grid lg:grid-cols-12 gap-8 lg:h-[700px]">
+      <div className="w-full max-w-6xl z-10 grid lg:grid-cols-12 gap-8 lg:h-[700px] h-auto">
 
         {/* --- LEFT COLUMN: Live Dashboard --- */}
         <motion.div
@@ -320,7 +320,7 @@ export default function WorkWithUsModal({
             />
           </div>
 
-          <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
+          <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 max-h-[60vh] lg:max-h-none">
             <AnimatePresence mode="wait">
 
               {/* STEP 1: Service Type */}

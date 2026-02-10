@@ -150,6 +150,18 @@ function AutoRotatingGlobe({ onUpdateRegion }: { onUpdateRegion: (idx: number) =
 export default function MobileGlobeReviews({ category = "Web App" }: { category?: string }) {
   const [reviews, setReviews] = useState<ReviewRow[]>([]);
   const [regionIndex, setRegionIndex] = useState(0);
+  const containerRef = useRef<HTMLElement>(null);
+
+  // Viewport Culling
+  const [isVisible, setIsVisible] = useState(true);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   // Modals
   const [showForm, setShowForm] = useState(false);
@@ -232,11 +244,11 @@ export default function MobileGlobeReviews({ category = "Web App" }: { category?
   const bottomReview = reviews[(regionIndex + 1) % reviews.length];
 
   return (
-    <section className="relative w-full h-[100svh] bg-black overflow-hidden flex flex-col">
+    <section ref={containerRef} className="relative w-full h-[100svh] bg-black overflow-hidden flex flex-col">
 
       {/* 1. 3D BACKGROUND (Z-0) */}
       <div className="absolute inset-0 z-0">
-        <Canvas camera={{ position: [0, 0, 2.6], fov: 60 }} gl={{ alpha: true }}>
+        <Canvas camera={{ position: [0, 0, 2.6], fov: 60 }} gl={{ alpha: true }} frameloop={isVisible ? "always" : "never"}>
           <ambientLight intensity={1} />
           <Suspense fallback={null}>
             <AutoRotatingGlobe onUpdateRegion={setRegionIndex} />

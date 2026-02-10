@@ -24,6 +24,16 @@ export default function Rings3D() {
     const container = containerRef.current;
     if (!container) return;
 
+    // Viewport Culling
+    let isVisible = true;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+      },
+      { threshold: 0 }
+    );
+    observer.observe(container);
+
     let width = container.clientWidth || 300;
     let height = container.clientHeight || 300;
 
@@ -52,13 +62,19 @@ export default function Rings3D() {
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
 
-    const bloomPass = new UnrealBloomPass(
-      new THREE.Vector2(width, height),
-      0.8,   // strength kam kiya (less aggressive glow)
-      0.2,   // radius kam (glow tight aur soft)
-      0.9    // threshold thoda high (sirf bright areas pe bloom)
-    );
-    composer.addPass(bloomPass);
+    // Bloom Optimization
+    // Mobile Check
+    const isMobile = window.innerWidth < 768;
+
+    if (!isMobile) {
+      const bloomPass = new UnrealBloomPass(
+        new THREE.Vector2(width / 2, height / 2), // Half resolution for performance
+        0.5, // Less intense
+        0.3, // Slightly larger radius
+        0.85 // High threshold
+      );
+      composer.addPass(bloomPass);
+    }
 
     // Lights
     scene.add(new THREE.AmbientLight(0xffffff, 0.6)); // thoda kam ambient
@@ -157,7 +173,9 @@ export default function Rings3D() {
       group.rotation.x = THREE.MathUtils.degToRad(rotationX.current);
       group.rotation.y = THREE.MathUtils.degToRad(rotationY.current);
 
-      composer.render();
+      if (isVisible) {
+        composer.render();
+      }
       requestAnimationFrame(animate);
     };
     requestAnimationFrame(animate);
@@ -248,6 +266,7 @@ export default function Rings3D() {
 
     // Cleanup
     return () => {
+      observer.disconnect();
       resizeObserver.disconnect();
       cancelAnimationFrame(animate as any);
       composer.dispose();

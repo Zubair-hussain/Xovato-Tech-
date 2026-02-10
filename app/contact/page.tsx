@@ -31,6 +31,7 @@ export default function ContactPage() {
         servicesBtnRef={servicesBtnRef}
         panelRef={panelRef}
         scrollTo={scrollTo}
+        scrollProg={0}
       />
 
       {/* Suspense ko yahan broader bana do – pura dynamic part wrap */}

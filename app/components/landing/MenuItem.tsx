@@ -62,7 +62,7 @@ const MenuItem = ({ title, paragraph, images, link, isFirst }: MenuItemProps) =>
   }, [paragraph]);
 
   const isTouchRef = useRef(false);
-  
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     isTouchRef.current =
@@ -90,8 +90,10 @@ const MenuItem = ({ title, paragraph, images, link, isFirst }: MenuItemProps) =>
       if (!part) return;
 
       const w = part.offsetWidth || 1;
-      const needed = Math.ceil(window.innerWidth / w) + 2;
-      setRepetitions(Math.max(2, needed));
+      // Reduce repetitions on mobile to save DOM elements
+      const multiplier = window.innerWidth < 768 ? 1.2 : 2;
+      const needed = Math.ceil(window.innerWidth / w) + multiplier;
+      setRepetitions(Math.max(2, Math.floor(needed)));
     };
 
     calc();

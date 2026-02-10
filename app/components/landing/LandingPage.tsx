@@ -18,6 +18,7 @@ export default function LandingPage() {
   const [servicesOpen, setServicesOpen] = useState(false);
   const [showScrollCta, setShowScrollCta] = useState(false);
   const [navSolid, setNavSolid] = useState(false);
+  const [scrollProg, setScrollProg] = useState(0);
 
   const servicesBtnRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -27,6 +28,15 @@ export default function LandingPage() {
   useLenis((lenis) => {
     ScrollTrigger.update();
   });
+
+  // Mobile Detection for Performance
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile(); // Check on mount
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoaded(true), 420);
@@ -62,9 +72,10 @@ export default function LandingPage() {
   }, [servicesOpen]);
 
   // Update UI on scroll via Lenis
-  useLenis(({ scroll }) => {
+  useLenis(({ scroll, limit, progress }) => {
     setShowScrollCta(scroll > 140);
     setNavSolid(scroll > 18);
+    setScrollProg(progress * 100);
   });
 
   // Custom scrollTo with navbar offset
@@ -113,15 +124,16 @@ export default function LandingPage() {
       ref={lenisRef}
       autoRaf={true}
       options={{
-        lerp: 0.08,
-        duration: 1.2,
-        smoothWheel: true,
+        lerp: isMobile ? 0 : 0.08,
+        duration: isMobile ? 0 : 1.2,
+        smoothWheel: !isMobile,
         syncTouch: false,
       }}
     >
       <div className="relative min-h-screen bg-black text-white">
         <Navbar
           navSolid={navSolid}
+          scrollProg={scrollProg}
           servicesOpen={servicesOpen}
           setServicesOpen={setServicesOpen}
           servicesBtnRef={servicesBtnRef}
@@ -136,7 +148,6 @@ export default function LandingPage() {
               <div className="min-h-[80vh] flex items-center justify-center text-white/60">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-                  <p>Loading sections...</p>
                 </div>
               </div>
             }

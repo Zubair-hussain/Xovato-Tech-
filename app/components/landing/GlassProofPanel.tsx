@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useLayoutEffect, useState } from "react";
+import React, { useRef, useLayoutEffect, useState, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 // ✅ Fixed typo in import path (MeanuItem -> MenuItem)
@@ -52,6 +52,15 @@ export default function GlassProofPanel() {
   const glowRef = useRef<HTMLDivElement>(null);
   const hasPlayedRef = useRef(false);
   const [isWorkWithUsOpen, setIsWorkWithUsOpen] = useState(false);
+
+  // Mobile Detection
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useLayoutEffect(() => {
     const panel = panelRef.current;
@@ -127,7 +136,7 @@ export default function GlassProofPanel() {
         <div className="glass-inner" />
 
         <div ref={glowRef} className="glass-glow-wrapper">
-          <div className="glass-water" />
+          {!isMobile && <div className="glass-water" />}
         </div>
 
         <div className="glass-content relative z-10 px-5 py-8 sm:px-10 sm:py-12 md:px-14 md:py-14">
@@ -294,10 +303,17 @@ export default function GlassProofPanel() {
             border-radius: 22px;
             background: rgba(12, 14, 13, 0.65);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(18px) saturate(1.2);
-            -webkit-backdrop-filter: blur(18px) saturate(1.2);
+            backdrop-filter: blur(var(--glass-blur, 18px)) saturate(1.2);
+            -webkit-backdrop-filter: blur(var(--glass-blur, 18px)) saturate(1.2);
             box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05),
               inset 0 18px 42px rgba(0, 0, 0, 0.45);
+          }
+
+          @media (max-width: 768px) {
+            .glass-inner {
+              --glass-blur: 0px;
+              background: rgba(12, 14, 13, 0.95);
+            }
           }
 
           @media (max-width: 640px) {

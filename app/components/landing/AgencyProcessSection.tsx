@@ -71,8 +71,8 @@ function PixelHoverImage({
     if (typeof window === "undefined") return;
     setIsTouch(
       "ontouchstart" in window ||
-        (navigator.maxTouchPoints ?? 0) > 0 ||
-        window.matchMedia?.("(pointer: coarse)")?.matches
+      (navigator.maxTouchPoints ?? 0) > 0 ||
+      window.matchMedia?.("(pointer: coarse)")?.matches
     );
   }, []);
 
@@ -81,10 +81,12 @@ function PixelHoverImage({
     if (!grid) return;
 
     grid.innerHTML = "";
-    const size = 100 / gridSize;
+    // Reduce grid size on mobile to save DOM elements
+    const actualGridSize = isTouch ? Math.floor(gridSize / 2) : gridSize;
+    const size = 100 / actualGridSize;
 
-    for (let r = 0; r < gridSize; r++) {
-      for (let c = 0; c < gridSize; c++) {
+    for (let r = 0; r < actualGridSize; r++) {
+      for (let c = 0; c < actualGridSize; c++) {
         const px = document.createElement("div");
         px.className = "px-cell";
         px.style.position = "absolute";
@@ -135,24 +137,16 @@ function PixelHoverImage({
         <Image src={src} alt={alt} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
       </div>
 
-      {/* one-word text INSIDE image */}
       <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
         <span
-          className="
-            rounded-full border border-white/15 bg-black/35
-            px-4 py-2
-            text-white/95 font-semibold uppercase tracking-[0.22em]
-            text-sm sm:text-base md:text-lg
-            backdrop-blur-md
-          "
+          className="rounded-full border border-white/15 bg-black/35 px-4 py-2 text-white/95 font-semibold uppercase tracking-[0.22em] text-sm sm:text-base md:text-lg backdrop-blur-md"
           style={{ textShadow: "0 10px 28px rgba(0,0,0,0.65)" }}
         >
           {label}
         </span>
       </div>
 
-      {/* pixel overlay */}
-      <div ref={gridRef} className="pointer-events-none absolute inset-0 z-20" />
+      <div ref={gridRef} className="pointer-events-none absolute inset-0 z-20 will-change-contents" />
       <div className="pointer-events-none absolute inset-0 z-[5] bg-gradient-to-tr from-transparent via-transparent to-white/10" />
     </div>
   );
@@ -171,21 +165,27 @@ function SpotlightCard({
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState(0);
+  const spotlightRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
+    if (!ref.current || !spotlightRef.current) return;
     const rect = ref.current.getBoundingClientRect();
-    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    spotlightRef.current.style.setProperty("--x", `${x}px`);
+    spotlightRef.current.style.setProperty("--y", `${y}px`);
   };
 
   return (
     <div
       ref={ref}
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setOpacity(0.7)}
-      onMouseLeave={() => setOpacity(0)}
+      onMouseEnter={() => {
+        if (spotlightRef.current) spotlightRef.current.style.opacity = "0.7";
+      }}
+      onMouseLeave={() => {
+        if (spotlightRef.current) spotlightRef.current.style.opacity = "0";
+      }}
       className={[
         "group relative overflow-hidden rounded-3xl",
         "border border-white/10 bg-white/[0.04] backdrop-blur-sm",
@@ -196,10 +196,11 @@ function SpotlightCard({
       ].join(" ")}
     >
       <div
-        className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-700 ease-out"
+        ref={spotlightRef}
+        className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-700 ease-out will-change-[background,opacity]"
         style={{
-          opacity,
-          background: `radial-gradient(circle 900px at ${mousePos.x}px ${mousePos.y}px, ${spotlightColor}, transparent 40%)`,
+          opacity: 0,
+          background: `radial-gradient(circle 900px at var(--x, 50%) var(--y, 50%), ${spotlightColor}, transparent 40%)`,
         }}
       />
       <div className="pointer-events-none absolute -right-24 -top-24 z-0 h-72 w-72 rounded-full bg-emerald-600/10 blur-3xl" />
@@ -362,7 +363,7 @@ export default function AgencyProcessSection() {
       revealAll();
       try {
         ScrollTrigger.refresh(true);
-      } catch {}
+      } catch { }
     }, 900);
 
     return () => {

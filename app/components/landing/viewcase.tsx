@@ -13,9 +13,11 @@ import {
     CheckCircle2,
     Zap,
     Users,
-    Award
+    Award,
+    X
 } from 'lucide-react';
 import { Inter } from 'next/font/google';
+import { useRouter } from 'next/navigation';
 
 // --- Typography ---
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -81,8 +83,17 @@ const stats = [
 ];
 
 export default function ViewCase() {
+    const router = useRouter();
     return (
         <main className={`min-h-screen bg-[#020604] text-gray-200 selection:bg-emerald-500/30 ${inter.className}`}>
+            {/* --- CLOSE BUTTON --- */}
+            <button
+                onClick={() => router.back()}
+                className="fixed top-6 right-6 z-[100] w-12 h-12 rounded-full bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-black border border-emerald-500/20 hover:border-emerald-500 flex items-center justify-center transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.1)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] backdrop-blur-md hover:scale-110 active:scale-95"
+                title="Close and return"
+            >
+                <X size={24} />
+            </button>
 
             {/* NOTE: Since you have a fixed Navbar, we add 'pt-28' (padding-top) 
         to ensure the Hero content isn't hidden behind it.

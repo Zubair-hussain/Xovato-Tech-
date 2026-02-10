@@ -25,6 +25,7 @@ export default function WorkWithUsPage() {
                 servicesBtnRef={servicesBtnRef}
                 panelRef={panelRef}
                 scrollTo={scrollTo}
+                scrollProg={0}
             />
 
             <div className="pt-16">

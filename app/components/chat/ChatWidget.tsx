@@ -20,10 +20,10 @@ export default function ChatWidget() {
   useEffect(() => {
     const updateConstraints = () => {
       setDragConstraints({
-        top: -window.innerHeight * 0.75,
-        bottom: window.innerHeight * 0.25,
-        left: -window.innerWidth * 0.85,
-        right: window.innerWidth * 0.15,
+        top: -window.innerHeight + 100, // Keep ~100px visible at top
+        bottom: 0,
+        left: -window.innerWidth + 100, // Keep ~100px visible at left
+        right: 0, // Don't allow going off-screen to the right
       });
     };
 
